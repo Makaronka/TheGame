@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TheGame
 {
@@ -13,14 +9,28 @@ namespace TheGame
             Array.Copy(items, _items, Math.Min(items.Length, _items.Length));
         }
 
-        //private bool FindItem(Item item)
-        //{
-        //    for (int i = 0; i < _rawSize * _collSize; i++)
-        //        if (_items[i].Title == item.Title)
-        //            return true;
-        //    return false;
-        //}
-
+        private bool FindItem(Item item)
+        {
+            for (int i = 0; i < _rawSize * _collSize; i++)
+                if (_items[i] != null && _items[i].Title == item.Title)
+                    return true;
+            return false;
+        }
+        public override bool AddItem(Item newItem, int quantity = 1)
+        {
+            if(!FindItem(newItem))
+            {
+                Item item = (Item)newItem.Clone();
+                for (int i = 0; i < _rawSize * _collSize; i++)
+                    if (_items[i] == null)
+                    {
+                        _items[i] = item;
+                        return true;
+                    }
+                return false;
+            }
+            return true;
+        }
         public bool Sell(Item item, ItemManager IM)
         {
             if (item is ITradable)
@@ -38,7 +48,7 @@ namespace TheGame
                 if(IM.PlayerInventory.AddItem(item))
                 {
                     IM.Player.Gold -= (item as ITradable).Cost;
-                    DellItem(item);
+                    //DellItem(item);
                     return true;
                 }
             }

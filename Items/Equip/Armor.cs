@@ -3,12 +3,21 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TheGame.Equip
 {
-    class Armor : Item, IEquippable
+    class Armor : Item, IEquippable, ITradable
     {
-        private int _defense;
-        public Armor(string title, string description, Texture2D icon, int defense = 0) : base(title, description, icon)
+        private int _defense, _cost;
+        public Armor(string title, string description, Texture2D icon, int defense = 0, int cost = 100) : base(title, description, icon)
         {
             _defense = defense;
+            _cost = cost;
+        }
+
+        public int Cost
+        {
+            get
+            {
+                return _cost;
+            }
         }
 
         public override object Clone()

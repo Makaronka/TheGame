@@ -24,7 +24,7 @@ namespace TheGame
             }
             return false;
         }
-        public bool AddItem(Item newItem, int quantity = 1)
+        public virtual bool AddItem(Item newItem, int quantity = 1)
         {
             if (newItem != null && quantity > 0)
             {

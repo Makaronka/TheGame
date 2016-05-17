@@ -52,7 +52,7 @@
   <ItemGroup>
     <Compile Include="Chest.cs" />
     <Compile Include="Container.cs" />
-    <Compile Include="Equipment.cs" />
+    <Compile Include="Containers\Equipment.cs" />
     <Compile Include="Items\Equip\Armor.cs" />
     <Compile Include="Items\Equip\Boots.cs" />
     <Compile Include="Items\Equip\Glove.cs" />

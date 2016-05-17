@@ -7,12 +7,21 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TheGame.Equip
 {
-    class Boots : Item, IEquippable
+    class Boots : Item, IEquippable, ITradable
     {
-        private int _agility;
-        public Boots(string title, string description, Texture2D icon, int agility = 0) : base(title, description, icon)
+        private int _agility, _cost;
+        public Boots(string title, string description, Texture2D icon, int agility = 0, int cost = 30) : base(title, description, icon)
         {
             _agility = agility;
+            _cost = cost;
+        }
+
+        public int Cost
+        {
+            get
+            {
+                return _cost;
+            }
         }
 
         public override object Clone()
