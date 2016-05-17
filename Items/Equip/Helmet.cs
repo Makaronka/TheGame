@@ -24,9 +24,10 @@ namespace TheGame.Equip
             }
             else
             {
-                IM.PlayerInventory.AddItem(IM.Player.Equip.Helmet);
+                Item item = IM.Player.Equip.Helmet;
                 IM.Player.Equip.Helmet = this;
                 IM.PlayerInventory.DellItem(this);
+                IM.PlayerInventory.AddItem(item);
             }
         }
 

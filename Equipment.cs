@@ -3,45 +3,49 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TheGame
 {
-    class Equipment
+    class Equipment:Container
     {
-        private Weapon _weapon;
-        private Equip.Boots _boots;
-        private Equip.Armor _armor;
-        private Equip.Glove _glove;
-        private Equip.Helmet _helmet;
-
-        public Equipment(Weapon weapon = null, Equip.Boots boots = null, Equip.Armor armor = null, Equip.Glove glove = null, Equip.Helmet helmet = null)
+        public Equipment(int x = 320, int y = 320, int cellSize = 32, Equip.Weapon weapon = null, Equip.Boots boots = null, Equip.Armor armor = null, Equip.Glove glove = null, Equip.Helmet helmet = null)
         {
-            _weapon = weapon;
-            _boots = boots;
-            _armor = armor;
-            _glove = glove;
-            _helmet = helmet;
+            _collSize = 5;
+            _cellSize = cellSize;
+            _rawSize = 1;
+            _x = x;
+            _y = y;
+            _items = new Item[5];
+            _items[0] = helmet;
+            _items[1] = armor;
+            _items[2] = glove;
+            _items[3] = boots;
+            _items[4] = weapon;
         }
-        public Weapon Weapon
+        public Equip.Weapon Weapon
         {
-            get { return _weapon; }
-            set { _weapon = value; }
+            get { return (Equip.Weapon)_items[4]; }
+            set { _items[4] = value; }
         }
         public Equip.Boots Boots
         {
-            get { return _boots; }
-            set { _boots = value; }
+            get { return (Equip.Boots)_items[3]; }
+            set { _items[3] = value; }
         }
         public Equip.Armor Armor {
-            get { return _armor; }
-            set { _armor = value; }
+            get { return (Equip.Armor)_items[1]; }
+            set { _items[1] = value; }
         }
         public Equip.Glove Glove
         {
-            get { return _glove; }
-            set { _glove = value; }
+            get { return (Equip.Glove)_items[2]; }
+            set { _items[2] = value; }
         }
         public Equip.Helmet Helmet
         {
-            get { return _helmet; }
-            set { _helmet = value; }
+            get { return (Equip.Helmet)_items[0]; }
+            set { _items[0] = value; }
+        }
+        public Item[] Items
+        {
+            get { return _items; }
         }
     }
 }

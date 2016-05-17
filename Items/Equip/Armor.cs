@@ -25,9 +25,10 @@ namespace TheGame.Equip
             }
             else
             {
-                IM.PlayerInventory.AddItem(IM.Player.Equip.Armor);
+                Item item = IM.Player.Equip.Armor;                
                 IM.Player.Equip.Armor = this;
                 IM.PlayerInventory.DellItem(this);
+                IM.PlayerInventory.AddItem(item);
             }
         }
         public override void Use(ItemManager IM)

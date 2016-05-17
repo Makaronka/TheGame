@@ -24,38 +24,55 @@ namespace TheGame
             }
             return false;
         }
-        public bool AddItem(Item newItem)
+        public bool AddItem(Item newItem, int quantity = 1)
         {
-            if (newItem != null)
+            if (newItem != null && quantity > 0)
             {
-                Item item = (Item)newItem.Clone();
-                if (item is IStackable)
+                for (int q = 0; q < quantity; q++)
                 {
-                    int capacity = Capacity, maxQuant = (item as IStackable).MaxQuantity;
-                    for (int i = 0; i < capacity; i++)
+                    Item item = (Item)newItem.Clone();
+                    if (item is IStackable)
                     {
-                        if (_items[i] != null)
+                        int capacity = Capacity, maxQuant = (item as IStackable).MaxQuantity;
+                        bool isAdded = false;
+                        for (int i = 0; i < capacity; i++)
                         {
-                            if (_items[i].Title == item.Title && (_items[i] as IStackable).Quantity < maxQuant)
+                            if (_items[i] != null)
                             {
-                                if ((_items[i] as IStackable).Quantity + (item as IStackable).Quantity <= maxQuant)
+                                if (_items[i].Title == item.Title && (_items[i] as IStackable).Quantity < maxQuant)
                                 {
-                                    (_items[i] as IStackable).Quantity += (item as IStackable).Quantity;
-                                    return true;
-                                }
-                                else
-                                {
-                                    (_items[i] as IStackable).Quantity = maxQuant;
-                                    (item as IStackable).Quantity = (_items[i] as IStackable).Quantity + (item as IStackable).Quantity - maxQuant;
-                                    return InsertItem(item);
+                                    if ((_items[i] as IStackable).Quantity + (item as IStackable).Quantity <= maxQuant)
+                                    {
+                                        (_items[i] as IStackable).Quantity += (item as IStackable).Quantity;
+                                        isAdded = true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        (_items[i] as IStackable).Quantity = maxQuant;
+                                        (item as IStackable).Quantity = (_items[i] as IStackable).Quantity + (item as IStackable).Quantity - maxQuant;
+                                        if (!InsertItem(item))
+                                            return false;
+                                        isAdded = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
+                        if (!isAdded && !InsertItem(item))
+                        {
+                            return false;
+                        }
                     }
-                    return InsertItem(item);
+                    else
+                    {
+                        if (!InsertItem(item))
+                            return false;
+                        else
+                            break;
+                    }
                 }
-                else
-                    return InsertItem(item);
+                return true;
             }
             else
                 return false;

@@ -8,14 +8,17 @@ namespace TheGame
         private Texture2D _tx;
         private Equipment _equip;
 
-        public Player(int Xpos, int Ypos, int maxHp, int gold = 50)
+        public Player(int Xpos, int Ypos, int maxHp, int gold = 50, Equipment equip = null)
         {
             _x = Xpos;
             _y = Ypos;
             _maxHp = maxHp;
             _hp = maxHp;
             _gold = gold;
-            _equip = new Equipment();
+            if (equip == null)
+                _equip = new Equipment();
+            else
+                _equip = equip;
         }
         public int X
         {
@@ -30,7 +33,7 @@ namespace TheGame
         public int Hp
         {
             get { return _hp; }
-            set 
+            set
             {
                 if (value >= 0)
                     _hp = value > _maxHp ? _maxHp : value;

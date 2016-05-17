@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace TheGame
+namespace TheGame.Equip
 {
     class Weapon: Item, IEquippable
     {
@@ -24,9 +24,10 @@ namespace TheGame
             }
             else
             {
-                IM.PlayerInventory.AddItem(IM.Player.Equip.Weapon);
+                Item item = IM.Player.Equip.Weapon;
                 IM.Player.Equip.Weapon = this;
                 IM.PlayerInventory.DellItem(this);
+                IM.PlayerInventory.AddItem(item);
             }
         }
 

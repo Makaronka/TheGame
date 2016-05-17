@@ -25,9 +25,10 @@ namespace TheGame.Equip
             }
             else
             {
-                IM.PlayerInventory.AddItem(IM.Player.Equip.Glove);
+                Item item = IM.Player.Equip.Glove;
                 IM.Player.Equip.Glove = this;
                 IM.PlayerInventory.DellItem(this);
+                IM.PlayerInventory.AddItem(item);
             }
         }
 

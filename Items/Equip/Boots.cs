@@ -29,9 +29,10 @@ namespace TheGame.Equip
             }
             else
             {
-                IM.PlayerInventory.AddItem(IM.Player.Equip.Boots);
+                Item item = IM.Player.Equip.Boots;
                 IM.Player.Equip.Boots = this;
                 IM.PlayerInventory.DellItem(this);
+                IM.PlayerInventory.AddItem(item);
             }
         }
 

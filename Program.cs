@@ -14,10 +14,10 @@ namespace TheGame
         Inventory inventory;
         ItemManager IM;
         Texture2D floor_tx;
-        Weapon sword;
+        Equip.Weapon sword;
         Potion healPotion, poison;
         SpriteFont quantity_fn, main_fn, discription_fn;
-        int MapSize = 20, TxSize = 32;
+        int MapSize = 20, TxSize = 32, equipStartX = 70, equipStartY = 44;
         List<IDrawable> MapElements;
         bool KeyIsDown = false, mouseRightClick = false;
 
@@ -30,8 +30,8 @@ namespace TheGame
             graphics.PreferMultiSampling = true;
             graphics.PreferredBackBufferWidth = MapSize * TxSize;
             graphics.PreferredBackBufferHeight = MapSize * TxSize;
-            player = new Player(2, 3, 100);
-            inventory = new Inventory(10, 6, 32, MapSize * TxSize, graphics.PreferredBackBufferHeight - 320);
+            player = new Player(2, 3, 100, equip: new Equipment(MapSize * TxSize + equipStartX, equipStartY));
+            inventory = new Inventory(10, 6, TxSize, MapSize * TxSize, graphics.PreferredBackBufferHeight - 320);
             IM = new ItemManager(player, inventory);
             MapElements = new List<IDrawable>();
             MapElements.Add(player);
@@ -54,14 +54,13 @@ namespace TheGame
             main_fn = Content.Load<SpriteFont>("Main");
             discription_fn = Content.Load<SpriteFont>("Discription");
             inventory.CellTexture = Content.Load<Texture2D>("invTx");
-            sword = new Weapon("Demon blade", "Best sword ever!", Content.Load<Texture2D>("demon_blade"));
+            player.Equip.CellTexture = Content.Load<Texture2D>("invTx");
+            sword = new Equip.Weapon("Demon blade", "Best sword ever!", Content.Load<Texture2D>("demon_blade"));
             healPotion = new Potion("Heal Potion", "Hell 10 hp.", Content.Load<Texture2D>("redPotion"), 10, 5, 15);
             inventory.AddItem(sword);
-            for (int i = 0; i < 7; i++)
-                inventory.AddItem(healPotion);
+            inventory.AddItem(healPotion, 10);
             poison = new Potion("Poison", "Hit 10 hp.", Content.Load<Texture2D>("greenPot"), -10, 6, 5);
-            for (int i = 0; i < 15; i++)
-                inventory.AddItem(poison);
+            inventory.AddItem(poison,10);
             MapElements.Add(new Chest(5, 5, Content.Load<Texture2D>("chest"), Content.Load<Texture2D>("invTx"), healPotion, poison, sword));
             healPotion.Quantity = 4;
             MapElements.Add(new Shop(7, 3, Content.Load<Texture2D>("shop"), Content.Load<Texture2D>("invTx"), healPotion, poison));
@@ -133,13 +132,8 @@ namespace TheGame
             return null;
         }
 
-        protected override void Update(GameTime gameTime)
+        private void MouseUpdate(MouseState mState)
         {
-            KeyboardState currKeyboard = Keyboard.GetState();
-            PlayerUpdate(currKeyboard);
-
-            //Mouse check
-            MouseState mState = Mouse.GetState();
             if (mState.RightButton == ButtonState.Pressed)
             {
                 if (!mouseRightClick)
@@ -163,33 +157,42 @@ namespace TheGame
                                         inventory.DellItem(item);
                                 }
                                 else
-                                {
                                     if ((IM.TargetContainer as Inventory).AddItem(item))
-                                        inventory.DellItem(item);
-                                }
+                                    inventory.DellItem(item);
                             }
                             else
                             {
                                 item = GetItemFromContainer(mState.X, mState.Y, IM.TargetContainer);
                                 if (item != null)
-                                {
                                     if (IM.TargetContainer is VendorInventory)
-                                    {
                                         (IM.TargetContainer as VendorInventory).Buy(item, IM);
-                                    }
                                     else
                                     {
                                         inventory.AddItem(item);
                                         IM.TargetContainer.DellItem(item);
                                     }
-                                }
                             }
                         }
+                    }
+                    item = GetItemFromContainer(mState.X, mState.Y, player.Equip);
+                    if (item != null)
+                    {
+                        inventory.AddItem(item);
+                        player.Equip.DellItem(item);
                     }
                 }
             }
             else
                 mouseRightClick = false;
+        }
+        protected override void Update(GameTime gameTime)
+        {
+            KeyboardState currKeyboard = Keyboard.GetState();
+            PlayerUpdate(currKeyboard);
+
+            //Mouse check
+            MouseState mState = Mouse.GetState();
+            MouseUpdate(mState);
 
             base.Update(gameTime);
         }
@@ -205,32 +208,25 @@ namespace TheGame
             foreach (IDrawable el in MapElements)
                 spriteBatch.Draw(el.Texture, new Vector2(el.X * TxSize, el.Y * TxSize), Color.White);
             spriteBatch.End();
-            //Player Info
-            DrawInventory(inventory);
             if (IM.TargetContainer != null)
                 DrawInventory(IM.TargetContainer);
+            DrawPlayerInfo(player);
+            base.Draw(gameTime);
+        }
+        private void DrawPlayerInfo(Player player)
+        {
             spriteBatch.Begin();
             spriteBatch.DrawString(main_fn, "Health: " + player.Hp.ToString() + "/" + player.MaxHp.ToString(), new Vector2(MapSize * TxSize + 10, 10), Color.DarkGreen);
-            spriteBatch.DrawString(main_fn, "Gold:   " + player.Gold.ToString(), new Vector2(MapSize * TxSize + 10, 24), Color.Yellow);
-            //Equip
+            spriteBatch.DrawString(main_fn, "Gold:   " + player.Gold.ToString(), new Vector2(MapSize * TxSize + 10, 30), Color.Yellow);
+
             spriteBatch.DrawString(main_fn, "Helmet: ", new Vector2(MapSize * TxSize + 10, 52), Color.Black);
             spriteBatch.DrawString(main_fn, "Armour: ", new Vector2(MapSize * TxSize + 10, 84), Color.Black);
             spriteBatch.DrawString(main_fn, "Glove:  ", new Vector2(MapSize * TxSize + 10, 116), Color.Black);
             spriteBatch.DrawString(main_fn, "Boots:  ", new Vector2(MapSize * TxSize + 10, 148), Color.Black);
             spriteBatch.DrawString(main_fn, "Weapon: ", new Vector2(MapSize * TxSize + 10, 180), Color.Black);
-            if (player.Equip.Helmet != null)
-                spriteBatch.Draw(player.Equip.Helmet.Icon, new Vector2(MapSize * TxSize + 60, 42), Color.White);
-            if (player.Equip.Armor != null)
-                spriteBatch.Draw(player.Equip.Armor.Icon, new Vector2(MapSize * TxSize + 60, 74), Color.White);
-            if (player.Equip.Glove != null)
-                spriteBatch.Draw(player.Equip.Glove.Icon, new Vector2(MapSize * TxSize + 60, 106), Color.White);
-            if (player.Equip.Boots != null)
-                spriteBatch.Draw(player.Equip.Boots.Icon, new Vector2(MapSize * TxSize + 60, 138), Color.White);
-            if (player.Equip.Weapon != null)
-                spriteBatch.Draw(player.Equip.Weapon.Icon, new Vector2(MapSize * TxSize + 60, 170), Color.White);
             spriteBatch.End();
-
-            base.Draw(gameTime);
+            DrawInventory(player.Equip);
+            DrawInventory(inventory);
         }
 
         private void DrawInventory(Container inv)

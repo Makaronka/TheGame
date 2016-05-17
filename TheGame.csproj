@@ -69,7 +69,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Containers\VendorInventory.cs" />
-    <Compile Include="Items\Weapon.cs" />
+    <Compile Include="Items\Equip\Weapon.cs" />
     <Compile Include="Shop.cs" />
     <Compile Include="Store.cs" />
   </ItemGroup>
