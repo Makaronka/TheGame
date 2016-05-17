@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Input;
 namespace TheGame
 {
 
-    class Game1 : Game
+    sealed class Game1 : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -36,7 +36,6 @@ namespace TheGame
             MapElements = new List<IDrawable>();
             MapElements.Add(player);
         }
-
         protected override void Initialize()
         {
             this.IsMouseVisible = true;
@@ -44,7 +43,6 @@ namespace TheGame
             graphics.PreferredBackBufferHeight = MapSize * TxSize;
             base.Initialize();
         }
-
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -60,7 +58,7 @@ namespace TheGame
             inventory.AddItem(sword);
             inventory.AddItem(healPotion, 10);
             poison = new Potion("Poison", "Hit 10 hp.", Content.Load<Texture2D>("greenPot"), -10, 6, 5);
-            inventory.AddItem(poison,10);
+            inventory.AddItem(poison, 10);
             MapElements.Add(new Chest(5, 5, Content.Load<Texture2D>("chest"), Content.Load<Texture2D>("invTx"), healPotion, poison, sword));
             healPotion.Quantity = 4;
             MapElements.Add(new Shop(7, 3, Content.Load<Texture2D>("shop"), Content.Load<Texture2D>("invTx"), healPotion, poison));
@@ -72,12 +70,10 @@ namespace TheGame
 
             base.LoadContent();
         }
-
         protected override void UnloadContent()
         {
             base.UnloadContent();
         }
-
         private void PlayerUpdate(KeyboardState currKeyboard)
         {
             if (currKeyboard.GetPressedKeys().Length != 0)
@@ -122,24 +118,39 @@ namespace TheGame
             else
                 KeyIsDown = false;
         }
-
         private Item GetItemFromContainer(int mX, int mY, Container container)
         {
-            if (mX > container.X && mX < container.X + container.Wight && mY > container.Y && mY < container.Y + container.Hight)
+            if (container != null && mX > container.X && mX < container.X + container.Wight && mY > container.Y && mY < container.Y + container.Hight)
             {
                 return container.GetItem(mX - container.X, mY - container.Y);
             }
             return null;
         }
-
         private void MouseUpdate(MouseState mState)
         {
+            Item item = GetItemFromContainer(mState.X, mState.Y, inventory);
+            if (item != null)
+                IM.SelectedItem = item;
+            else
+            {
+                Item eq = GetItemFromContainer(mState.X, mState.Y, player.Equip);
+                if (eq != null)
+                    IM.SelectedItem = eq;
+                else
+                {
+                    eq = GetItemFromContainer(mState.X, mState.Y, IM.TargetContainer);
+                    if (eq != null)
+                        IM.SelectedItem = eq;
+                    else
+                        IM.SelectedItem = null;
+                }
+            }
+
             if (mState.RightButton == ButtonState.Pressed)
             {
                 if (!mouseRightClick)
                 {
                     mouseRightClick = true;
-                    Item item = GetItemFromContainer(mState.X, mState.Y, inventory);
                     if (IM.TargetContainer == null)
                     {
                         if (item != null)
@@ -196,7 +207,6 @@ namespace TheGame
 
             base.Update(gameTime);
         }
-
         protected override void Draw(GameTime gameTime)
         {
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -208,6 +218,8 @@ namespace TheGame
             foreach (IDrawable el in MapElements)
                 spriteBatch.Draw(el.Texture, new Vector2(el.X * TxSize, el.Y * TxSize), Color.White);
             spriteBatch.End();
+            if (IM.SelectedItem != null)
+                DrawItemInfo(IM.SelectedItem);
             if (IM.TargetContainer != null)
                 DrawInventory(IM.TargetContainer);
             DrawPlayerInfo(player);
@@ -228,7 +240,6 @@ namespace TheGame
             DrawInventory(player.Equip);
             DrawInventory(inventory);
         }
-
         private void DrawInventory(Container inv)
         {
             int itemX, itemY;
@@ -245,6 +256,15 @@ namespace TheGame
                         spriteBatch.DrawString(quantity_fn, ((IStackable)inv.GetItem(i)).Quantity.ToString(), new Vector2(itemX + inv.GetItem(i).Icon.Width - 8, itemY + inv.GetItem(i).Icon.Height - 14), Color.DarkGreen);
                 }
             }
+            spriteBatch.End();
+        }
+        private void DrawItemInfo(Item item)
+        {
+            spriteBatch.Begin();
+            spriteBatch.DrawString(main_fn, "Item info:", new Vector2(MapSize * TxSize + 10, equipStartY + player.Equip.Hight + 10), Color.Purple);
+            spriteBatch.DrawString(discription_fn, "Title: " + item.Title + "\nDiscription: " + item.Description, new Vector2(MapSize * TxSize + 10, equipStartY + player.Equip.Hight + 24), Color.Black);
+            if (item is ITradable)
+                spriteBatch.DrawString(discription_fn, "Cost: " + (item as ITradable).Cost.ToString(), new Vector2(graphics.PreferredBackBufferWidth - 50, inventory.Y - 15), Color.Black);
             spriteBatch.End();
         }
     }

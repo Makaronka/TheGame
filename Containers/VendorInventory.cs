@@ -18,7 +18,7 @@ namespace TheGame
         }
         public override bool AddItem(Item newItem, int quantity = 1)
         {
-            if(!FindItem(newItem))
+            if(!(newItem is IStackable) || !FindItem(newItem))
             {
                 Item item = (Item)newItem.Clone();
                 for (int i = 0; i < _rawSize * _collSize; i++)
@@ -48,7 +48,10 @@ namespace TheGame
                 if(IM.PlayerInventory.AddItem(item))
                 {
                     IM.Player.Gold -= (item as ITradable).Cost;
-                    //DellItem(item);
+                    if (!(item is IStackable))
+                    {
+                        DellItem(item);
+                    }
                     return true;
                 }
             }

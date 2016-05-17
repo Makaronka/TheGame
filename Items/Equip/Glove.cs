@@ -10,7 +10,7 @@ namespace TheGame.Equip
         public Glove(string title, string description, Texture2D icon, float crit = 0.1f, int cost = 25) : base(title, description, icon)
         {
             _crit = crit;
-            _cost = Cost;
+            _cost = cost;
         }
 
         public override object Clone()
